@@ -7,7 +7,7 @@ DB ||= Sequel.connect(connection_string)                                        
 # Database schema - this should reflect your domain model
 
 # New domain model - adds users
-DB.create_table! :events do
+DB.create_table! :hikes do
   primary_key :id
   String :title
   String :description, text: true
