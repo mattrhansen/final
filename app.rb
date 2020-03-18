@@ -40,18 +40,19 @@ post "/hikes/create" do
             location: params["location"]
         )
 
+    account_sid = ENV["TWILIO_ACCOUNT_SID"]
+    auth_token = ENV["TWILIO_AUTH_TOKEN"]
+    client = Twilio::REST::Client.new(account_sid, auth_token)
+    client.messages.create(
+        from: "+12075013031", 
+        to: "+12149950874",
+        body: "A new itineray has emerged! Check it out on HikeRight!")
         view "create_hike"
     end
 end
 
 before do
     @current_user = users_table.where(id: session["user_id"]).to_a[0]
-end
-
-get'/send_text' do
-    account_sid = ENV ["TWILIO_ACCOUNT_SID"]
-
-    auth_token= ENV ["TWILIO_AUTH_TOKEN"]
 end
 
 # homepage and list of events (aka "index")
