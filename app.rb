@@ -15,7 +15,7 @@ before { puts; puts "--------------- NEW REQUEST ---------------"; puts }       
 after { puts; }                                                                       #
 #######################################################################################
 
-events_table = DB.from(:events)
+hikes_table = DB.from(:hikes)
 rsvps_table = DB.from(:rsvps)
 users_table = DB.from(:users)
 
@@ -25,58 +25,57 @@ end
 
 get'/send_text' do
     account_sid = ENV ["TWILIO_ACCOUNT_SID"]
-    
-    auth_token= ENV ["TWILIO_AUTH_TOKEN"]
 
+    auth_token= ENV ["TWILIO_AUTH_TOKEN"]
 end
 
 # homepage and list of events (aka "index")
 get "/" do
     puts "params: #{params}"
 
-    @events = events_table.all.to_a
-    pp @events
+    @hikes = hikes_table.all.to_a
+    pp @hikes
 
-    view "events"
+    view "hikes"
 end
 
 # event details (aka "show")
-get "/events/:id" do
+get "/hikes/:id" do
     puts "params: #{params}"
 
     @users_table = users_table
-    @event = events_table.where(id: params[:id]).to_a[0]
-    pp @event
+    @hike = hikes_table.where(id: params[:id]).to_a[0]
+    pp @hike
 
-    @rsvps = rsvps_table.where(event_id: @event[:id]).to_a
-    @going_count = rsvps_table.where(event_id: @event[:id], going: true).count
+    @rsvps = rsvps_table.where(hike_id: @hike[:id]).to_a
+    @going_count = rsvps_table.where(hike_id: @hike[:id], going: true).count
 
-    view "event"
+    view "hike"
 end
 
 # display the rsvp form (aka "new")
-get "/events/:id/rsvps/new" do
+get "/hikes/:id/rsvps/new" do
     puts "params: #{params}"
 
-    @event = events_table.where(id: params[:id]).to_a[0]
+    @hike = hikes_table.where(id: params[:id]).to_a[0]
     view "new_rsvp"
 end
 
 # receive the submitted rsvp form (aka "create")
-post "/events/:id/rsvps/create" do
+post "/hikes/:id/rsvps/create" do
     puts "params: #{params}"
 
     # first find the event that rsvp'ing for
-    @event = events_table.where(id: params[:id]).to_a[0]
+    @hike = hikes_table.where(id: params[:id]).to_a[0]
     # next we want to insert a row in the rsvps table with the rsvp form data
     rsvps_table.insert(
-        event_id: @event[:id],
+        hike_id: @hike[:id],
         user_id: session["user_id"],
         comments: params["comments"],
         going: params["going"]
     )
 
-    redirect "/events/#{@event[:id]}"
+    redirect "/hikes/#{@hike[:id]}"
 end
 
 # display the rsvp form (aka "edit")
@@ -84,7 +83,7 @@ get "/rsvps/:id/edit" do
     puts "params: #{params}"
 
     @rsvp = rsvps_table.where(id: params["id"]).to_a[0]
-    @event = events_table.where(id: @rsvp[:event_id]).to_a[0]
+    @hike = hikes_table.where(id: @rsvp[:hike_id]).to_a[0]
     view "edit_rsvp"
 end
 
@@ -95,7 +94,7 @@ post "/rsvps/:id/update" do
     # find the rsvp to update
     @rsvp = rsvps_table.where(id: params["id"]).to_a[0]
     # find the rsvp's event
-    @event = events_table.where(id: @rsvp[:event_id]).to_a[0]
+    @hike = hikes_table.where(id: @rsvp[:hike_id]).to_a[0]
 
     if @current_user && @current_user[:id] == @rsvp[:id]
         rsvps_table.where(id: params["id"]).update(
@@ -103,7 +102,7 @@ post "/rsvps/:id/update" do
             comments: params["comments"]
         )
 
-        redirect "/events/#{@event[:id]}"
+        redirect "/hikes/#{@hike[:id]}"
     else
         view "error"
     end
@@ -114,11 +113,11 @@ get "/rsvps/:id/destroy" do
     puts "params: #{params}"
 
     rsvp = rsvps_table.where(id: params["id"]).to_a[0]
-    @event = events_table.where(id: rsvp[:event_id]).to_a[0]
+    @hike = hikes_table.where(id: rsvp[:hike_id]).to_a[0]
 
     rsvps_table.where(id: params["id"]).delete
 
-    redirect "/events/#{@event[:id]}"
+    redirect "/hikes/#{@hike[:id]}"
 end
 
 # display the signup form (aka "new")

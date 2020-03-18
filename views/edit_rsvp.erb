@@ -1,8 +1,8 @@
 <h2>
     <i class="far fa-calendar-alt"></i>
-    <%= @event[:date] %>
+    <%= @hike[:date] %>
 </h2>
-<h1>Edit RSVP for <%= @event[:title] %></h1>
+<h1>Edit RSVP for <%= @hike[:title] %></h1>
 
 <form action="/rsvps/<%= @rsvp[:id] %>/update" method="post">
   <div class="form-group">
