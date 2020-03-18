@@ -39,7 +39,7 @@ get "/" do
     view "hikes"
 end
 
-# event details (aka "show")
+# hike details (aka "show")
 get "/hikes/:id" do
     puts "params: #{params}"
 
