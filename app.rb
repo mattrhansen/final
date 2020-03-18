@@ -19,6 +19,31 @@ hikes_table = DB.from(:hikes)
 rsvps_table = DB.from(:rsvps)
 users_table = DB.from(:users)
 
+# display the new hike form (aka "new")
+get "/hikes/new" do
+    view "new_hike"
+end
+
+# receive the submitted signup form (aka "create")
+post "/hikes/create" do
+    puts "params: #{params}"
+
+    # if there's already a user with this email, skip!
+    existing_hike = hikes_table.where(location: params["location"]).to_a[0]
+    if existing_hike
+        view "error"
+    else
+        hikes_table.insert(
+            title: params["title"],
+            description: params["description"],
+            date: params["date"],
+            location: params["location"]
+        )
+
+        view "create_hike"
+    end
+end
+
 before do
     @current_user = users_table.where(id: session["user_id"]).to_a[0]
 end
@@ -176,3 +201,4 @@ get "/logout" do
     session["user_id"] = nil
     redirect "/logins/new"
 end
+
